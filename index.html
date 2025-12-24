@@ -40,7 +40,6 @@
       align-content: start;
     }
 
-    /* Ren header */
     .hero{
       border: 1px solid var(--line);
       background: rgba(255,255,255,.04);
@@ -59,7 +58,6 @@
       font-size: 14px;
     }
 
-    /* Stage (åpne-animasjon) */
     .stage{
       border: 1px solid var(--line);
       background: rgba(255,255,255,.04);
@@ -148,18 +146,6 @@
       filter: drop-shadow(0 10px 16px rgba(0,0,0,.25));
     }
 
-    .introTitle{
-      margin: 0;
-      font-size: 18px;
-      letter-spacing: -0.01em;
-    }
-    .introSub{
-      margin: 0;
-      color: var(--muted);
-      font-size: 14px;
-    }
-
-    /* Selve bildet (skjult til åpning) */
     .cardWrap{
       display:none;
       padding: 14px;
@@ -175,7 +161,7 @@
       background: rgba(255,255,255,.02);
     }
 
-    /* Åpne-animasjon */
+    /* Åpne- og lukke-animasjon */
     .opening .presentBox{
       animation: pop 520ms cubic-bezier(.2,.9,.2,1) 1;
     }
@@ -185,21 +171,27 @@
     .opening .bow{
       animation: bowUp 520ms cubic-bezier(.2,.9,.2,1) 1 forwards;
     }
-
     @keyframes pop{
       0%{ transform: scale(.98); }
       60%{ transform: scale(1.02); }
       100%{ transform: scale(1); }
     }
-    @keyframes fadeRibbon{
-      to{ opacity: .25; }
-    }
+    @keyframes fadeRibbon{ to{ opacity: .25; } }
     @keyframes bowUp{
       0%{ transform: translate(-50%, -50%); }
       100%{ transform: translate(-50%, -72%); opacity: .65; }
     }
 
-    /* Fullscreen zoom (trykk på bildet) */
+    /* En liten, ren fade på bildet når det vises */
+    .cardWrap.show img{
+      animation: fadeIn 320ms ease 1;
+    }
+    @keyframes fadeIn{
+      from{ opacity: 0; transform: translateY(6px); }
+      to{ opacity: 1; transform: translateY(0); }
+    }
+
+    /* Fullscreen zoom */
     .overlay{
       position: fixed;
       inset: 0;
@@ -229,6 +221,19 @@
       border-radius: 14px;
     }
 
+    /* Confetti canvas */
+    canvas#confetti{
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 60;
+      opacity: 0;
+      transition: opacity .2s ease;
+    }
+    body.confetti-on canvas#confetti{ opacity: 1; }
+
     @media (max-width: 560px){
       .wrap{ padding: 14px 12px 28px; }
       .hero{ border-radius: 16px; }
@@ -240,29 +245,33 @@
       .opening .presentBox,
       .opening .ribbonV,
       .opening .ribbonH,
-      .opening .bow{ animation: none; }
+      .opening .bow,
+      .cardWrap.show img{ animation: none; }
       .overlay{ backdrop-filter: none; }
+      canvas#confetti{ display:none; }
     }
   </style>
 </head>
 
 <body>
+  <canvas id="confetti"></canvas>
+
   <div class="wrap">
     <header class="hero">
       <h1>Julegave</h1>
-      <p>Trykk for å åpne gavekortet.</p>
+      <p>Trykk for å åpne og lukke gavekortet.</p>
     </header>
 
     <section class="stage" aria-label="Gavekort">
-      <button class="tapArea" id="tapArea" aria-label="Åpne gavekort">
+      <button class="tapArea" id="tapArea" aria-label="Åpne/lukk gavekort">
         <div class="intro" id="intro">
           <div class="presentBox" aria-hidden="true">
             <div class="ribbonV"></div>
             <div class="ribbonH"></div>
             <div class="bow"><div class="knot"></div></div>
           </div>
-          <p class="introTitle">Åpne gavekort</p>
-          <p class="introSub">Trykk hvor som helst i boksen.</p>
+          <!-- Fjernet teksten nederst du nevnte: vi beholder bare en ren liten tittel -->
+          <p style="margin:0; color: var(--muted); font-size:14px;">Trykk hvor som helst</p>
         </div>
 
         <div class="cardWrap" id="cardWrap">
@@ -285,22 +294,129 @@
     const cardImg = document.getElementById("cardImg");
     const overlay = document.getElementById("overlay");
 
+    // Confetti
+    const canvas = document.getElementById("confetti");
+    const ctx = canvas.getContext("2d");
+    let confetti = [];
+    let anim = null;
+
+    function resize(){
+      const dpr = Math.max(1, window.devicePixelRatio || 1);
+      canvas.width = Math.floor(window.innerWidth * dpr);
+      canvas.height = Math.floor(window.innerHeight * dpr);
+      canvas.style.width = window.innerWidth + "px";
+      canvas.style.height = window.innerHeight + "px";
+      ctx.setTransform(dpr,0,0,dpr,0,0);
+    }
+    window.addEventListener("resize", resize);
+    resize();
+
+    function confettiBurst(){
+      confetti = [];
+      const count = 110;
+      const w = window.innerWidth;
+      const h = window.innerHeight;
+      const originX = w * 0.5;
+      const originY = Math.min(h * 0.22, 220);
+
+      for(let i=0;i<count;i++){
+        const angle = (Math.random() * Math.PI) - (Math.PI/2);
+        const speed = 6 + Math.random() * 7;
+        confetti.push({
+          x: originX,
+          y: originY,
+          vx: Math.cos(angle) * speed + (Math.random()*1.2 - .6),
+          vy: Math.sin(angle) * speed - (Math.random()*3),
+          g: 0.22 + Math.random()*0.12,
+          w: 5 + Math.random()*7,
+          h: 8 + Math.random()*10,
+          r: Math.random() * Math.PI,
+          vr: (Math.random()*0.2 - 0.1),
+          life: 0,
+          max: 70 + Math.random()*35
+        });
+      }
+
+      document.body.classList.add("confetti-on");
+      setTimeout(() => document.body.classList.remove("confetti-on"), 1100);
+
+      if(anim) cancelAnimationFrame(anim);
+      tick();
+      setTimeout(() => { if(anim) cancelAnimationFrame(anim); anim = null; }, 1300);
+    }
+
+    function tick(){
+      ctx.clearRect(0,0,window.innerWidth, window.innerHeight);
+
+      for(const p of confetti){
+        p.life += 1;
+        p.vy += p.g;
+        p.x += p.vx;
+        p.y += p.vy;
+        p.r += p.vr;
+
+        const alpha = Math.max(0, 1 - (p.life / p.max));
+        ctx.globalAlpha = alpha;
+
+        ctx.save();
+        ctx.translate(p.x, p.y);
+        ctx.rotate(p.r);
+
+        const pick = p.life % 3;
+        ctx.fillStyle =
+          pick === 0 ? "rgba(255,190,210,.95)" :
+          pick === 1 ? "rgba(245,248,255,.85)" :
+                       "rgba(215,181,109,.90)";
+        ctx.fillRect(-p.w/2, -p.h/2, p.w, p.h);
+
+        ctx.restore();
+      }
+
+      ctx.globalAlpha = 1;
+
+      confetti = confetti.filter(p => p.life < p.max && p.y < window.innerHeight + 60);
+      if(confetti.length > 0) anim = requestAnimationFrame(tick);
+    }
+
+    // Open/close logic
     let opened = false;
 
-    function openCard(){
-      if (opened) return;
-      opened = true;
-
-      // play opening animation class on container
+    function showGift(){
       tapArea.classList.add("opening");
-
-      // after a short beat, reveal the image
       setTimeout(() => {
         intro.style.display = "none";
         cardWrap.classList.add("show");
       }, 520);
     }
 
+    function hideGift(){
+      // tilbake til “gave”-view
+      cardWrap.classList.remove("show");
+      intro.style.display = "grid";
+      // reset anim state so it can play again
+      tapArea.classList.remove("opening");
+      // liten reflow for å resette CSS animasjon
+      void tapArea.offsetWidth;
+    }
+
+    function toggleGift(){
+      if (!opened){
+        opened = true;
+        showGift();
+        confettiBurst();
+      } else {
+        opened = false;
+        hideGift();
+      }
+    }
+
+    tapArea.addEventListener("click", () => {
+      // Hvis overlay er åpen, ikke toggl underliggende
+      if (overlay.classList.contains("open")) return;
+      toggleGift();
+    });
+
+    // Fullscreen zoom: trykk på bildet når det er åpent
     function openOverlay(){
       overlay.classList.add("open");
       overlay.setAttribute("aria-hidden", "false");
@@ -310,11 +426,6 @@
       overlay.setAttribute("aria-hidden", "true");
     }
 
-    tapArea.addEventListener("click", () => {
-      if (!opened) openCard();
-    });
-
-    // Tap image for fullscreen once it exists
     cardImg.addEventListener("click", (e) => {
       e.stopPropagation();
       openOverlay();
