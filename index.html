@@ -8,12 +8,17 @@
 
   <style>
     :root{
-      --bg1:#0b0f19;
-      --bg2:#0f1628;
-      --line: rgba(255,255,255,.10);
-      --text: rgba(245,248,255,.95);
-      --muted: rgba(245,248,255,.72);
-      --shadow: 0 28px 90px rgba(0,0,0,.55);
+      --bg1:#0f0820;
+      --bg2:#140a2a;
+
+      --line: rgba(255,255,255,.12);
+      --text: rgba(252,248,255,.96);
+      --muted: rgba(252,248,255,.72);
+
+      --pink: rgba(255, 150, 205, .22);
+      --violet: rgba(185, 135, 255, .18);
+
+      --shadow: 0 30px 95px rgba(0,0,0,.58);
       --radius: 22px;
       --sans: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Arial, sans-serif;
     }
@@ -25,8 +30,9 @@
       font-family: var(--sans);
       color: var(--text);
       background:
-        radial-gradient(900px 520px at 18% 10%, rgba(255,190,210,.16), transparent 60%),
-        radial-gradient(760px 480px at 82% 18%, rgba(255,255,255,.08), transparent 55%),
+        radial-gradient(820px 520px at 16% 10%, var(--pink), transparent 60%),
+        radial-gradient(760px 520px at 86% 16%, var(--violet), transparent 60%),
+        radial-gradient(560px 420px at 60% 80%, rgba(255,255,255,.06), transparent 60%),
         linear-gradient(180deg, var(--bg1), var(--bg2));
       overflow-x:hidden;
     }
@@ -42,10 +48,11 @@
 
     .hero{
       border: 1px solid var(--line);
-      background: rgba(255,255,255,.04);
+      background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
       border-radius: 18px;
       padding: 14px 14px;
-      backdrop-filter: blur(10px);
+      backdrop-filter: blur(12px);
+      box-shadow: 0 18px 55px rgba(0,0,0,.35);
     }
     .hero h1{
       margin:0;
@@ -60,13 +67,14 @@
 
     .stage{
       border: 1px solid var(--line);
-      background: rgba(255,255,255,.04);
+      background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
       border-radius: var(--radius);
       box-shadow: var(--shadow);
       overflow: hidden;
       position: relative;
     }
 
+    /* hele boksen er klikkbar */
     .tapArea{
       width: 100%;
       border: 0;
@@ -90,20 +98,21 @@
       width: min(420px, 92%);
       aspect-ratio: 16/10;
       border-radius: 18px;
-      border: 1px solid rgba(255,255,255,.12);
+      border: 1px solid rgba(255,255,255,.14);
       background:
-        radial-gradient(260px 140px at 30% 20%, rgba(255,190,210,.18), transparent 60%),
-        radial-gradient(300px 180px at 70% 30%, rgba(255,255,255,.10), transparent 60%),
+        radial-gradient(260px 140px at 30% 20%, rgba(255,150,205,.22), transparent 60%),
+        radial-gradient(320px 190px at 70% 30%, rgba(185,135,255,.16), transparent 60%),
         rgba(255,255,255,.03);
       position: relative;
       overflow: hidden;
+      box-shadow: 0 18px 70px rgba(0,0,0,.42);
     }
 
     .ribbonV{
       position:absolute; top:0; bottom:0; left:50%;
       width: 18%;
       transform: translateX(-50%);
-      background: rgba(245,248,255,.14);
+      background: rgba(252,248,255,.14);
       border-left: 1px solid rgba(255,255,255,.10);
       border-right: 1px solid rgba(255,255,255,.10);
     }
@@ -111,7 +120,7 @@
       position:absolute; left:0; right:0; top:50%;
       height: 18%;
       transform: translateY(-50%);
-      background: rgba(245,248,255,.14);
+      background: rgba(252,248,255,.14);
       border-top: 1px solid rgba(255,255,255,.10);
       border-bottom: 1px solid rgba(255,255,255,.10);
     }
@@ -129,7 +138,7 @@
       top: 18px;
       width: 72px; height: 52px;
       border-radius: 20px 34px 20px 34px;
-      background: rgba(245,248,255,.20);
+      background: rgba(252,248,255,.18);
       border: 1px solid rgba(255,255,255,.12);
       filter: drop-shadow(0 10px 16px rgba(0,0,0,.25));
     }
@@ -141,7 +150,7 @@
       transform: translateX(-50%);
       width: 28px; height: 28px;
       border-radius: 10px;
-      background: rgba(245,248,255,.22);
+      background: rgba(252,248,255,.20);
       border: 1px solid rgba(255,255,255,.12);
       filter: drop-shadow(0 10px 16px rgba(0,0,0,.25));
     }
@@ -157,11 +166,11 @@
       height: auto;
       display:block;
       border-radius: 18px;
-      box-shadow: 0 16px 55px rgba(0,0,0,.38);
+      box-shadow: 0 18px 60px rgba(0,0,0,.42);
       background: rgba(255,255,255,.02);
     }
 
-    /* Åpne- og lukke-animasjon */
+    /* Åpne-animasjon */
     .opening .presentBox{
       animation: pop 520ms cubic-bezier(.2,.9,.2,1) 1;
     }
@@ -171,6 +180,7 @@
     .opening .bow{
       animation: bowUp 520ms cubic-bezier(.2,.9,.2,1) 1 forwards;
     }
+
     @keyframes pop{
       0%{ transform: scale(.98); }
       60%{ transform: scale(1.02); }
@@ -182,43 +192,13 @@
       100%{ transform: translate(-50%, -72%); opacity: .65; }
     }
 
-    /* En liten, ren fade på bildet når det vises */
+    /* Ren fade på bildet */
     .cardWrap.show img{
       animation: fadeIn 320ms ease 1;
     }
     @keyframes fadeIn{
       from{ opacity: 0; transform: translateY(6px); }
       to{ opacity: 1; transform: translateY(0); }
-    }
-
-    /* Fullscreen zoom */
-    .overlay{
-      position: fixed;
-      inset: 0;
-      background: rgba(5,8,14,.74);
-      backdrop-filter: blur(10px);
-      display:none;
-      align-items:center;
-      justify-content:center;
-      padding: 14px;
-      z-index: 50;
-    }
-    .overlay.open{ display:flex; }
-    .overlayInner{
-      width: min(980px, 100%);
-      max-height: 92vh;
-      border-radius: 18px;
-      border: 1px solid rgba(255,255,255,.14);
-      background: rgba(255,255,255,.04);
-      box-shadow: 0 30px 90px rgba(0,0,0,.60);
-      overflow:auto;
-      padding: 14px;
-    }
-    .overlayInner img{
-      width: 100%;
-      height: auto;
-      display:block;
-      border-radius: 14px;
     }
 
     /* Confetti canvas */
@@ -247,7 +227,6 @@
       .opening .ribbonH,
       .opening .bow,
       .cardWrap.show img{ animation: none; }
-      .overlay{ backdrop-filter: none; }
       canvas#confetti{ display:none; }
     }
   </style>
@@ -270,29 +249,27 @@
             <div class="ribbonH"></div>
             <div class="bow"><div class="knot"></div></div>
           </div>
-          <!-- Fjernet teksten nederst du nevnte: vi beholder bare en ren liten tittel -->
           <p style="margin:0; color: var(--muted); font-size:14px;">Trykk hvor som helst</p>
         </div>
 
         <div class="cardWrap" id="cardWrap">
-          <img class="gavekort" id="cardImg" src="gavekort.png" alt="Gavekort" />
+          <img class="gavekort" src="gavekort.png" alt="Gavekort" />
         </div>
       </button>
     </section>
-  </div>
-
-  <div class="overlay" id="overlay" aria-hidden="true">
-    <div class="overlayInner" role="dialog" aria-label="Gavekort i fullskjerm" tabindex="0">
-      <img src="gavekort.png" alt="Gavekort i fullskjerm" />
-    </div>
   </div>
 
   <script>
     const tapArea = document.getElementById("tapArea");
     const intro = document.getElementById("intro");
     const cardWrap = document.getElementById("cardWrap");
-    const cardImg = document.getElementById("cardImg");
-    const overlay = document.getElementById("overlay");
+
+    // Haptics (vibrasjon). Fungerer på mange Android, noen iOS-browsere støtter ikke.
+    function haptic(ms){
+      try{
+        if (navigator.vibrate) navigator.vibrate(ms);
+      } catch {}
+    }
 
     // Confetti
     const canvas = document.getElementById("confetti");
@@ -313,7 +290,7 @@
 
     function confettiBurst(){
       confetti = [];
-      const count = 110;
+      const count = 120;
       const w = window.innerWidth;
       const h = window.innerHeight;
       const originX = w * 0.5;
@@ -333,7 +310,7 @@
           r: Math.random() * Math.PI,
           vr: (Math.random()*0.2 - 0.1),
           life: 0,
-          max: 70 + Math.random()*35
+          max: 70 + Math.random()*40
         });
       }
 
@@ -342,7 +319,7 @@
 
       if(anim) cancelAnimationFrame(anim);
       tick();
-      setTimeout(() => { if(anim) cancelAnimationFrame(anim); anim = null; }, 1300);
+      setTimeout(() => { if(anim) cancelAnimationFrame(anim); anim = null; }, 1350);
     }
 
     function tick(){
@@ -362,11 +339,12 @@
         ctx.translate(p.x, p.y);
         ctx.rotate(p.r);
 
+        // rosa/lilla/hvit konfetti
         const pick = p.life % 3;
         ctx.fillStyle =
-          pick === 0 ? "rgba(255,190,210,.95)" :
-          pick === 1 ? "rgba(245,248,255,.85)" :
-                       "rgba(215,181,109,.90)";
+          pick === 0 ? "rgba(255,150,205,.95)" :
+          pick === 1 ? "rgba(185,135,255,.90)" :
+                       "rgba(252,248,255,.82)";
         ctx.fillRect(-p.w/2, -p.h/2, p.w, p.h);
 
         ctx.restore();
@@ -378,7 +356,7 @@
       if(confetti.length > 0) anim = requestAnimationFrame(tick);
     }
 
-    // Open/close logic
+    // Toggle open/close
     let opened = false;
 
     function showGift(){
@@ -390,50 +368,35 @@
     }
 
     function hideGift(){
-      // tilbake til “gave”-view
       cardWrap.classList.remove("show");
       intro.style.display = "grid";
-      // reset anim state so it can play again
+
+      // reset anim so it can play again next open
       tapArea.classList.remove("opening");
-      // liten reflow for å resette CSS animasjon
       void tapArea.offsetWidth;
     }
 
     function toggleGift(){
       if (!opened){
         opened = true;
+        haptic(25);
         showGift();
         confettiBurst();
       } else {
         opened = false;
+        haptic(10);
         hideGift();
       }
     }
 
-    tapArea.addEventListener("click", () => {
-      // Hvis overlay er åpen, ikke toggl underliggende
-      if (overlay.classList.contains("open")) return;
-      toggleGift();
-    });
+    tapArea.addEventListener("click", toggleGift);
 
-    // Fullscreen zoom: trykk på bildet når det er åpent
-    function openOverlay(){
-      overlay.classList.add("open");
-      overlay.setAttribute("aria-hidden", "false");
-    }
-    function closeOverlay(){
-      overlay.classList.remove("open");
-      overlay.setAttribute("aria-hidden", "true");
-    }
-
-    cardImg.addEventListener("click", (e) => {
-      e.stopPropagation();
-      openOverlay();
-    });
-
-    overlay.addEventListener("click", closeOverlay);
-    window.addEventListener("keydown", (e) => {
-      if (e.key === "Escape") closeOverlay();
+    // Keyboard (enter/space) for completeness
+    tapArea.addEventListener("keydown", (e) => {
+      if(e.key === "Enter" || e.key === " "){
+        e.preventDefault();
+        toggleGift();
+      }
     });
   </script>
 </body>
